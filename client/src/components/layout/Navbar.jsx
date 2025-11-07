@@ -7,61 +7,124 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  function doLogout(){
+  function doLogout() {
     logout();
     navigate("/");
   }
 
   return (
-    <header className="navbar">
-      <div className="container navbar-inner">
-        <Link to="/" className="brand">Karriera<span>AL</span></Link>
+    <header className="navbar" style={navStyle}>
+      <div style={containerStyle}>
+        {/* Logo */}
+        <Link to="/" style={brandStyle}>
+          Karriera<span style={{ color: "var(--primary)" }}>AL</span>
+        </Link>
 
-        <nav className="nav-links">
+        {/* Links */}
+        <nav style={linksStyle}>
           <Link to="/punet">Punë</Link>
           <Link to="/kompani">Kompani</Link>
           <Link to="/rrjeti">Rrjeti</Link>
           <Link to="/ngjarje">Ngjarje</Link>
-          <Link to="/messages">Mesazhe</Link>
+          {user && <Link to="/applications">Aplikimet</Link>}
+          {user && <Link to="/messages">Mesazhe</Link>}
         </nav>
 
-        <div className="nav-cta">
+        {/* CTA */}
+        <div style={ctaStyle}>
           {!user ? (
             <>
-              <Link to="/login" className="button-outline">Hyni</Link>
-              <Link to="/register" className="button-primary">Regjistrohu</Link>
+              <Link to="/login" className="button-outline">
+                Hyni
+              </Link>
+              <Link to="/register" className="button-primary">
+                Regjistrohu
+              </Link>
             </>
           ) : (
             <>
-              <Link to="/feed" className="button-outline">Rrjeti</Link>
-              <Link to="/profile" className="button-primary">{user.name || "Profili"}</Link>
-              <button className="menu-toggle" onClick={() => setOpen(v => !v)}>Menu</button>
-              <button className="button-outline" onClick={doLogout}>Dil</button>
+              <Link to="/profile" className="button-outline">
+                {user.name || "Profili"}
+              </Link>
+              <button onClick={doLogout} className="button-primary">
+                Dil
+              </button>
             </>
           )}
         </div>
+
+        {/* Mobile toggle (opsional) */}
+        <button
+          onClick={() => setOpen(!open)}
+          style={{ background: "none", border: "none", fontSize: 20, display: "none" }}
+          className="menu-toggle"
+        >
+          ☰
+        </button>
       </div>
 
-      <div className={`nav-drawer ${open ? "open" : ""}`}>
-        <div className="container">
-          <Link to="/punet" onClick={()=>setOpen(false)}>Punë</Link>
-          <Link to="/kompani" onClick={()=>setOpen(false)}>Kompani</Link>
-          <Link to="/rrjeti" onClick={()=>setOpen(false)}>Rrjeti</Link>
-          <Link to="/ngjarje" onClick={()=>setOpen(false)}>Ngjarje</Link>
-          <Link to="/messages" onClick={()=>setOpen(false)}>Mesazhe</Link>
-          {!user ? (
-            <div style={{ display:"flex", gap:10, padding: "12px 0" }}>
-              <Link to="/login" className="button-outline" onClick={()=>setOpen(false)}>Hyni</Link>
-              <Link to="/register" className="button-primary" onClick={()=>setOpen(false)}>Regjistrohu</Link>
-            </div>
-          ) : (
-            <div style={{ display:"flex", gap:10, padding: "12px 0" }}>
-              <Link to="/profile" className="button-outline" onClick={()=>setOpen(false)}>Profili</Link>
-              <button className="button-primary" onClick={()=>{ setOpen(false); doLogout(); }}>Dil</button>
-            </div>
+      {/* Drawer menu për mobile */}
+      {open && (
+        <div style={drawerStyle}>
+          <Link to="/punet" onClick={() => setOpen(false)}>Punë</Link>
+          <Link to="/kompani" onClick={() => setOpen(false)}>Kompani</Link>
+          <Link to="/rrjeti" onClick={() => setOpen(false)}>Rrjeti</Link>
+          <Link to="/ngjarje" onClick={() => setOpen(false)}>Ngjarje</Link>
+          {user && (
+            <>
+              <Link to="/applications" onClick={() => setOpen(false)}>Aplikimet</Link>
+              <Link to="/messages" onClick={() => setOpen(false)}>Mesazhe</Link>
+              <Link to="/profile" onClick={() => setOpen(false)}>Profili</Link>
+              <button onClick={doLogout} className="button-primary">Dil</button>
+            </>
           )}
         </div>
-      </div>
+      )}
     </header>
   );
 }
+
+const navStyle = {
+  background: "var(--white)",
+  borderBottom: "1px solid var(--border)",
+  position: "sticky",
+  top: 0,
+  zIndex: 1000,
+};
+
+const containerStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "10px 20px",
+  maxWidth: "1100px",
+  margin: "0 auto",
+};
+
+const brandStyle = {
+  fontSize: "1.6rem",
+  fontWeight: "700",
+  color: "var(--text-dark)",
+  textDecoration: "none",
+};
+
+const linksStyle = {
+  display: "flex",
+  gap: "20px",
+  alignItems: "center",
+};
+
+const ctaStyle = {
+  display: "flex",
+  gap: "10px",
+  alignItems: "center",
+};
+
+const drawerStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px",
+  padding: "10px 20px",
+  background: "var(--white)",
+  borderTop: "1px solid var(--border)",
+};
