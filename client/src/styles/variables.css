@@ -1,0 +1,70 @@
+:root {
+  --primary: #FF4D4D;
+  --secondary: #E8F0FF;
+  --text-dark: #333333;
+  --text-light: #555555;
+  --bg-light: #FAFAFA;
+  --white: #FFFFFF;
+  --border: #E0E0E0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* Lidhje dhe butona */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Butoni kryesor */
+.button-primary {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.button-primary:hover {
+  background: #e64040;
+}
+
+/* Karta & hije e lehtë */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Tituj */
+h1, h2, h3 {
+  color: var(--text-dark);
+  font-weight: 600;
+  margin: 0.5em 0;
+}
+p {
+  color: var(--text-light);
+  margin-bottom: 1em;
+}
