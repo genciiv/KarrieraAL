@@ -1,47 +1,60 @@
-import { useEffect, useState } from "react";
-import JobFilters from "../components/jobs/JobFilters.jsx";
-import JobCard from "../components/jobs/JobCard.jsx";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { searchJobs } from "../lib/api.js";
-import { useToast } from "../contexts/ToastContext.jsx";
+import JobCard from "../components/jobs/JobCard.jsx";
+import { useJobs } from "../contexts/JobsContext.jsx";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
-export default function Jobs() {
-  const [loading, setLoading] = useState(true);
-  const [jobs, setJobs] = useState([]);
-  const { addToast } = useToast();
+export default function Jobs(){
+  const { jobs: postedJobs } = useJobs();
+  const { user } = useAuth();
+  const [seed, setSeed] = useState([]);
+  const [q, setQ] = useState("");
 
-  useEffect(() => {
-    handleSearch({});
-    // eslint-disable-next-line
+  useEffect(()=>{
+    (async ()=>{
+      const data = await searchJobs();
+      setSeed(data);
+    })();
   }, []);
 
-  async function handleSearch(filters){
-    setLoading(true);
-    const res = await searchJobs(filters);
-    setJobs(res);
-    setLoading(false);
-    addToast(`U gjetën ${res.length} vende pune`, "success");
-  }
+  const all = useMemo(()=>{
+    // postedJobs në krye, pastaj seed
+    const merged = [...postedJobs, ...seed];
+    if (!q.trim()) return merged;
+    const s = q.toLowerCase();
+    return merged.filter(j =>
+      j.title.toLowerCase().includes(s) ||
+      j.company?.toLowerCase().includes(s) ||
+      j.city?.toLowerCase().includes(s)
+    );
+  }, [postedJobs, seed, q]);
 
   return (
-    <div className="container" style={{marginTop: 24, display:"grid", gap:16}}>
-      <JobFilters onSearch={handleSearch} />
-      {loading ? (
-        <div className="grid grid-3">
-          {[...Array(3)].map((_,i)=>(
-            <div key={i} className="card">
-              <div className="skeleton shine" style={{height:16, width:"70%", marginBottom:10}}></div>
-              <div className="skeleton shine" style={{height:12, width:"40%", marginBottom:14}}></div>
-              <div className="skeleton shine" style={{height:12, width:"85%"}}></div>
-            </div>
-          ))}
+    <div className="container" style={{marginTop:24}}>
+      <div className="card" style={{display:"grid", gap:12}}>
+        <div style={{display:"flex", gap:12, alignItems:"center"}}>
+          <h2 style={{margin:0}}>Punë</h2>
+          <div style={{marginLeft:"auto", display:"flex", gap:8}}>
+            <input
+              className="input"
+              placeholder="Kërko sipas titullit, kompanisë, qytetit…"
+              value={q}
+              onChange={e=>setQ(e.target.value)}
+              style={{minWidth: 280}}
+            />
+            {user?.role === "Kompani" && (
+              <Link to="/punet/shto" className="button-primary">Posto punë</Link>
+            )}
+          </div>
         </div>
-      ) : jobs.length ? (
-        <div className="grid grid-3">
-          {jobs.map(j => <JobCard key={j.id} job={j} />)}
+
+        {!all.length && <div style={{color:"var(--text-light)"}}>S’u gjet asnjë rezultat.</div>}
+
+        <div className="grid grid-2">
+          {all.map(job => <JobCard key={job.id} job={job} />)}
         </div>
-      ) : (
-        <div className="card">Nuk u gjet asnjë rezultat me këto filtra.</div>
-      )}
+      </div>
     </div>
   );
 }

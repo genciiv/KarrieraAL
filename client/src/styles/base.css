@@ -212,3 +212,5 @@ a:hover { text-decoration: underline; }
 .center { display: grid; place-items: center; }
 .mt-24 { margin-top: 24px; }
 .mb-16 { margin-bottom: 16px; }
+.btn-right { display: inline-flex; justify-content: flex-end; width: 100%; }
+.avatar-img { width: 72px; height: 72px; overflow: hidden; }
