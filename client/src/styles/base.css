@@ -387,3 +387,24 @@ a:hover { text-decoration: underline; }
   border-radius: 8px;
   padding: 10px 12px;
 }
+
+
+/* FILTER BAR reuse */
+.filter-bar{ display:grid; gap:12px; }
+.filter-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.filter-label{ font-size:13px; color:#6b7280; font-weight:600; margin-right:6px; }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; }
+.chip-btn{
+  display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
+  background:#f3f4f6; color:#374151; border:1px solid #eaecf0; font-size:13px; font-weight:600; cursor:pointer; transition:.15s;
+}
+.chip-btn:hover{ background:#eef2f7; border-color:#dfe3ea; }
+.chip-btn.active{ background:#e8f3ff; color:#0a66c2; border-color:#b8d8ff; }
+.reset-btn{ margin-left:auto; background:transparent; border:1px dashed #d1d5db; color:#374151; padding:6px 10px; border-radius:8px; font-weight:600; cursor:pointer; }
+.reset-btn:hover{ border-color:#0a66c2; color:#0a66c2; }
+.search-input{ flex:1; min-width:240px; border:1px solid #e5e7eb; border-radius:8px; padding:10px 12px; }
+
+/* Company grid */
+.cards-3{ display:grid; gap:16px; grid-template-columns:repeat(3,1fr); }
+@media (max-width: 900px){ .cards-3 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px){ .cards-3 { grid-template-columns: 1fr; } }

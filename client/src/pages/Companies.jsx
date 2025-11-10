@@ -1,158 +1,267 @@
 import { useEffect, useMemo, useState } from "react";
 import CompanyCard from "../components/company/CompanyCard.jsx";
-import { COMPANIES, CITIES, INDUSTRIES } from "../data/companies.js";
-import { useToast } from "../contexts/ToastContext.jsx";
-import { Link } from "react-router-dom";
 
-const LS_COMPANIES = "ka_companies";
-const LS_FOLLOWS = "ka_company_follows";     // numri publik i ndjekësve
-const LS_MY_FOLLOWS = "ka_my_company_follows"; // kompanitë që po i ndjek unë
+/* ------------------ MOCK DATA (pa backend) ------------------ */
+const COMPANIES_MOCK = [
+  {
+    id: "c1",
+    name: "TechAL",
+    city: "Tiranë",
+    size: "50–200",
+    industry: "Software",
+    about: "Zgjidhje web me fokus në MERN dhe cloud.",
+    followers: 312,
+    openJobs: [
+      { id: "j101", title: "Frontend React", link: "/punet/j101" },
+      { id: "j102", title: "Backend Node.js", link: "/punet/j102" },
+      { id: "j103", title: "DevOps Engineer", link: "/punet/j103" },
+    ],
+  },
+  {
+    id: "c2",
+    name: "Vision Group",
+    city: "Tiranë",
+    size: "200–500",
+    industry: "Finance",
+    about: "Zgjidhje fintech dhe BI për tregun vendas.",
+    followers: 198,
+    openJobs: [
+      { id: "j201", title: "Data Analyst (BI)", link: "/punet/j201" },
+      { id: "j202", title: "QA Tester", link: "/punet/j202" },
+    ],
+  },
+  {
+    id: "c3",
+    name: "AlbaniaSoft",
+    city: "Durrës",
+    size: "20–50",
+    industry: "IT Services",
+    about: "Integrojmë sisteme dhe ofrojmë suport IT 24/7.",
+    followers: 144,
+    openJobs: [],
+  },
+  {
+    id: "c4",
+    name: "GreenTech AL",
+    city: "Vlorë",
+    size: "10–50",
+    industry: "Green Tech",
+    about: "Teknologji të gjelbra, IoT dhe energji e rinovueshme.",
+    followers: 86,
+    openJobs: [
+      { id: "j401", title: "IoT Engineer (Junior)", link: "/punet/j401" },
+    ],
+  },
+  {
+    id: "c5",
+    name: "EduNext",
+    city: "Fier",
+    size: "10–50",
+    industry: "EduTech",
+    about: "Platforma edutech dhe kursesh interaktive.",
+    followers: 120,
+    openJobs: [
+      { id: "j501", title: "Full-Stack (MERN)", link: "/punet/j501" },
+      { id: "j502", title: "UI/UX Designer", link: "/punet/j502" },
+      { id: "j503", title: "Product Owner", link: "/punet/j503" },
+      { id: "j504", title: "Content Manager", link: "/punet/j504" },
+    ],
+  },
+];
+
+/* ------------------ HELPERS ------------------ */
+const unique = (arr) => Array.from(new Set(arr.filter(Boolean)));
+
+const loadFollowSet = () => {
+  try {
+    const raw = localStorage.getItem("karriera_follows");
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw));
+  } catch {
+    return new Set();
+  }
+};
+const saveFollowSet = (set) => {
+  localStorage.setItem("karriera_follows", JSON.stringify(Array.from(set)));
+};
 
 export default function Companies() {
-  const { addToast } = useToast();
+  const baseCompanies = COMPANIES_MOCK;
 
-  useEffect(() => {
-    if (!localStorage.getItem(LS_COMPANIES)) {
-      localStorage.setItem(LS_COMPANIES, JSON.stringify(COMPANIES));
-    }
-    if (!localStorage.getItem(LS_FOLLOWS)) {
-      const base = {};
-      COMPANIES.forEach(c => { base[c.id] = Math.floor(15 + Math.random() * 80); });
-      localStorage.setItem(LS_FOLLOWS, JSON.stringify(base));
-    }
-    if (!localStorage.getItem(LS_MY_FOLLOWS)) {
-      localStorage.setItem(LS_MY_FOLLOWS, JSON.stringify([]));
-    }
-  }, []);
-
-  const [companies] = useState(() =>
-    JSON.parse(localStorage.getItem(LS_COMPANIES) || "[]")
-  );
-  const [follows, setFollows] = useState(() =>
-    JSON.parse(localStorage.getItem(LS_FOLLOWS) || "{}")
-  );
-  const [myFollows, setMyFollows] = useState(() =>
-    new Set(JSON.parse(localStorage.getItem(LS_MY_FOLLOWS) || "[]"))
-  );
-
-  // Modal: “Shih të gjitha punët”
-  const [open, setOpen] = useState(false);
-  const [modalCompany, setModalCompany] = useState(null);
-  function showAllJobs(c) { setModalCompany(c); setOpen(true); }
-
-  // Filtrat
+  // --- Filters state ---
   const [q, setQ] = useState("");
-  const [city, setCity] = useState("");
-  const [industry, setIndustry] = useState("");
-  const [withJobs, setWithJobs] = useState(""); // "", "me", "pa"
+  const [city, setCity] = useState("Të gjitha");
+  const [industry, setIndustry] = useState("Të gjitha");
+  const [onlyOpenings, setOnlyOpenings] = useState(false);
 
-  const cities = ["", ...CITIES];
-  const industries = ["", ...INDUSTRIES];
+  // --- Follow state (persist) ---
+  const [follows, setFollows] = useState(() => loadFollowSet());
+  useEffect(() => saveFollowSet(follows), [follows]);
 
-  const filtered = useMemo(() => {
-    const s = q.toLowerCase().trim();
-    return companies.filter(c => {
-      const matchQ =
-        !s ||
-        c.name.toLowerCase().includes(s) ||
-        c.industry.toLowerCase().includes(s) ||
-        c.city.toLowerCase().includes(s);
-      const matchCity = !city || c.city === city;
-      const matchInd = !industry || c.industry === industry;
-      const matchJobs =
-        !withJobs ||
-        (withJobs === "me" && c.openJobs?.length > 0) ||
-        (withJobs === "pa" && (!c.openJobs || c.openJobs.length === 0));
-      return matchQ && matchCity && matchInd && matchJobs;
-    });
-  }, [companies, q, city, industry, withJobs]);
+  // --- Followers count (mutable state, nis nga MOCK) ---
+  const [followersMap, setFollowersMap] = useState(() =>
+    Object.fromEntries(baseCompanies.map(c => [c.id, c.followers || 0]))
+  );
 
-  function toggleFollow(id) {
-    setMyFollows(prev => {
+  // --- Modal për “të gjitha pozicionet” ---
+  const [modalCompany, setModalCompany] = useState(null);
+
+  // --- Options dinamike ---
+  const cityOptions = useMemo(
+    () => ["Të gjitha", ...unique(baseCompanies.map(c => c.city))],
+    [baseCompanies]
+  );
+  const industryOptions = useMemo(
+    () => ["Të gjitha", ...unique(baseCompanies.map(c => c.industry))],
+    [baseCompanies]
+  );
+
+  // --- Filtering + Search ---
+  const companies = useMemo(() => {
+    let list = [...baseCompanies];
+
+    const qn = q.trim().toLowerCase();
+    if (qn) {
+      list = list.filter(c =>
+        [c.name, c.city, c.industry, c.about].join(" ").toLowerCase().includes(qn)
+      );
+    }
+    if (city !== "Të gjitha") list = list.filter(c => c.city === city);
+    if (industry !== "Të gjitha") list = list.filter(c => c.industry === industry);
+    if (onlyOpenings) list = list.filter(c => (c.openJobs || []).length > 0);
+
+    return list;
+  }, [baseCompanies, q, city, industry, onlyOpenings]);
+
+  const toggleFollow = (companyId) => {
+    setFollows(prev => {
       const next = new Set(prev);
-      const isFollowing = next.has(id);
-      if (isFollowing) next.delete(id); else next.add(id);
-
-      // persist lista ime
-      localStorage.setItem(LS_MY_FOLLOWS, JSON.stringify(Array.from(next)));
-
-      // rrit/ul numrin publik
-      setFollows(f => {
-        const obj = { ...f, [id]: Math.max(0, (f[id] || 0) + (isFollowing ? -1 : 1)) };
-        localStorage.setItem(LS_FOLLOWS, JSON.stringify(obj));
-        return obj;
-      });
-
-      addToast(isFollowing ? "E hoqët nga ndjekjet" : "Po ndiqni kompaninë ✅", "success");
+      const following = next.has(companyId);
+      if (following) {
+        next.delete(companyId);
+        setFollowersMap(m => ({ ...m, [companyId]: Math.max(0, (m[companyId] || 0) - 1) }));
+      } else {
+        next.add(companyId);
+        setFollowersMap(m => ({ ...m, [companyId]: (m[companyId] || 0) + 1 }));
+      }
       return next;
     });
-  }
+  };
+
+  const clearFilters = () => {
+    setQ("");
+    setCity("Të gjitha");
+    setIndustry("Të gjitha");
+    setOnlyOpenings(false);
+  };
 
   return (
-    <div className="container" style={{ marginTop: 24 }}>
-      <div className="card" style={{ display: "grid", gap: 12 }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <h2 style={{ margin: 0 }}>Kompani</h2>
-          <Link to="/ndjekjet" className="button-outline">Ndjekjet e mia</Link>
+    <div className="container" style={{ padding: "24px 0" }}>
+      <h2 style={{ margin: "0 0 12px" }}>Kompani</h2>
+
+      {/* FILTER BAR */}
+      <div className="card filter-bar" style={{ marginBottom: 16 }}>
+        {/* Rreshti 1: kërkimi + reset */}
+        <div className="filter-row">
+          <input
+            className="search-input"
+            placeholder="Kërko kompani, industri, qytet…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+          <button className="reset-btn" onClick={clearFilters}>Rivendos filtrat</button>
         </div>
 
-        {/* Filtrat */}
-        <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
-          <input className="input" style={{ flex: 2 }} placeholder="Kërko sipas emrit, industrisë, qytetit…"
-            value={q} onChange={e=>setQ(e.target.value)} />
-          <select className="select" value={city} onChange={e=>setCity(e.target.value)}>
-            {cities.map((c,i)=><option key={i} value={c}>{c || "Të gjitha qytetet"}</option>)}
-          </select>
-          <select className="select" value={industry} onChange={e=>setIndustry(e.target.value)}>
-            {industries.map((ind,i)=><option key={i} value={ind}>{ind || "Të gjitha industrinë"}</option>)}
-          </select>
-          <select className="select" value={withJobs} onChange={e=>setWithJobs(e.target.value)}>
-            <option value="">Me/Pa pozicione</option>
-            <option value="me">Vetëm me pozicione</option>
-            <option value="pa">Vetëm pa pozicione</option>
-          </select>
+        {/* Rreshti 2: QYTETI */}
+        <div className="filter-row">
+          <span className="filter-label">Qyteti:</span>
+          <div className="chips">
+            {cityOptions.map((opt) => (
+              <button
+                key={opt}
+                className={`chip-btn ${city === opt ? "active" : ""}`}
+                onClick={() => setCity(opt)}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Lista */}
-        {!filtered.length && <div className="helper">S’u gjet asnjë kompani me këta filtra.</div>}
+        {/* Rreshti 3: INDUSTRIA */}
+        <div className="filter-row">
+          <span className="filter-label">Industri:</span>
+          <div className="chips">
+            {industryOptions.map((opt) => (
+              <button
+                key={opt}
+                className={`chip-btn ${industry === opt ? "active" : ""}`}
+                onClick={() => setIndustry(opt)}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        <div className="grid-2">
-          {filtered.map(c => (
-            <div key={c.id} className="company-wrapper">
-              <CompanyCard
-                c={c}
-                following={myFollows.has(c.id)}
-                onToggleFollow={toggleFollow}
-                onShowAll={() => showAllJobs(c)}
-              />
-              <div className="follow-ct">
-                <span className="muted">Ndjekës: </span>
-                <strong>{follows[c.id] || 0}</strong>
-              </div>
-            </div>
-          ))}
+        {/* Rreshti 4: Vetëm me pozicione */}
+        <div className="filter-row" style={{ alignItems: "center" }}>
+          <label style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+            <input
+              type="checkbox"
+              checked={onlyOpenings}
+              onChange={(e) => setOnlyOpenings(e.target.checked)}
+            />
+            Vetëm me pozicione të hapura
+          </label>
+
+          <div style={{ marginLeft: "auto", color: "#6b7280", fontSize: 14 }}>
+            {companies.length} rezultate
+            {q && <> • kërkim për <strong>{q}</strong></>}
+          </div>
         </div>
       </div>
 
-      {/* MODAL – të gjitha punët e kompanisë */}
-      {open && modalCompany && (
-        <div className="modal-backdrop" onClick={() => setOpen(false)}>
-          <div className="modal" onClick={(e)=>e.stopPropagation()}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
-              <h3 style={{ margin:0 }}>{modalCompany.name} — punët e hapura</h3>
-              <button className="button-outline" onClick={()=>setOpen(false)}>Mbyll</button>
-            </div>
-            {!modalCompany.openJobs?.length ? (
-              <div className="helper">S’ka pozicione të hapura.</div>
+      {/* GRID i kompanive */}
+      {companies.length === 0 ? (
+        <div className="card" style={{ textAlign: "center", color: "#6b7280" }}>
+          Nuk u gjet asnjë kompani me këto filtra.
+        </div>
+      ) : (
+        <div className="cards-grid cards-3">
+          {companies.map(c => (
+            <CompanyCard
+              key={c.id}
+              c={c}
+              following={follows.has(c.id)}
+              followersCount={followersMap[c.id] || 0}
+              onToggleFollow={toggleFollow}
+              onShowAll={setModalCompany}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* MODAL për “të gjitha pozicionet” */}
+      {modalCompany && (
+        <div className="modal-backdrop" onClick={() => setModalCompany(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ marginTop: 0 }}>Pozicionet te {modalCompany.name}</h3>
+            {(modalCompany.openJobs || []).length === 0 ? (
+              <p style={{ color: "#6b7280" }}>Aktualisht s’ka pozicione të hapura.</p>
             ) : (
-              <div className="grid" style={{ gap:8 }}>
+              <ul style={{ paddingLeft: 18 }}>
                 {modalCompany.openJobs.map(j => (
-                  <Link key={j.id} to={j.link} className="job-pill" onClick={()=>setOpen(false)}>
-                    {j.title}
-                  </Link>
+                  <li key={j.id} style={{ marginBottom: 6 }}>
+                    <a href={j.link} title="Hap detajet">{j.title}</a>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
+
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+              <button className="btn-ghost" onClick={() => setModalCompany(null)}>Mbyll</button>
+            </div>
           </div>
         </div>
       )}
