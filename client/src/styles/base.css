@@ -223,3 +223,99 @@ a:hover { text-decoration: underline; }
 }
 
 .avatar-img { width: 72px; height: 72px; overflow: hidden; }
+
+
+/* ---------- HOME / HERO ---------- */
+.hero {
+  background: #eaf1ff55; /* blu shumë e lehtë */
+  padding: 48px 0 28px;
+}
+.hero-title {
+  font-size: clamp(26px, 3.2vw, 40px);
+  line-height: 1.2;
+  text-align: center;
+  margin: 0 0 8px 0;
+}
+.hero-sub {
+  text-align: center;
+  color: var(--text-light);
+  margin-bottom: 16px;
+}
+.cta-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+/* ---------- STATS ---------- */
+.stats {
+  margin-top: 8px;
+}
+.stat {
+  text-align: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 12px;
+}
+.stat-num {
+  font-weight: 800;
+  font-size: 28px;
+}
+.stat-label {
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+/* ---------- TESTIMONIALS ---------- */
+.testimonial {
+  text-align: center;
+  display: grid;
+  gap: 6px;
+}
+.testimonial-avatar {
+  margin: 0 auto 6px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-verylight, #ffe8e8);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--accent, #ff5a5f);
+}
+.testimonial-name { font-weight: 700; }
+.testimonial-role { color: var(--text-light); font-size: 14px; }
+.testimonial-text { margin-top: 6px; }
+
+/* ---------- PARTNERS ---------- */
+.partners-wrap { background: #fafbfd; padding: 16px 0; margin-top: 12px; }
+.partners {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+.partner-pill {
+  border: 1px dashed var(--border);
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px 14px;
+  text-align: center;
+  font-weight: 600;
+  color: #444;
+}
+
+/* ---------- FAQ ACCORDION ---------- */
+.accordion { display: grid; gap: 10px; }
+.acc-item { border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+.acc-q {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.acc-q:hover { background: #fafafa; }
+.acc-a { padding: 0 14px 14px; color: #444; }
+.acc-icon { color: var(--accent, #ff5a5f); font-size: 18px; }

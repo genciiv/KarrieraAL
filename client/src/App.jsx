@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 // Providers / Contexts
 import { ToastProvider } from "./contexts/ToastContext.jsx";
@@ -38,10 +38,10 @@ export default function App() {
         <ApplicationsProvider>
           <JobsProvider>
             <MessagesProvider>
-              <BrowserRouter>
+              <Router>
                 <Navbar />
                 <Routes>
-                  {/* 🌍 Publike */}
+                  {/* Publike */}
                   <Route path="/" element={<Home />} />
                   <Route path="/punet" element={<Jobs />} />
                   <Route path="/punet/:id" element={<JobDetails />} />
@@ -52,7 +52,7 @@ export default function App() {
                   <Route path="/login" element={<AuthLogin />} />
                   <Route path="/register" element={<AuthRegister />} />
 
-                  {/* 🏢 Vetëm për kompani */}
+                  {/* Vetëm kompani */}
                   <Route
                     path="/punet/shto"
                     element={
@@ -62,7 +62,7 @@ export default function App() {
                     }
                   />
 
-                  {/* 🔒 Të mbrojtura */}
+                  {/* Të mbrojtura */}
                   <Route
                     path="/feed"
                     element={
@@ -105,7 +105,7 @@ export default function App() {
                   />
                 </Routes>
                 <Footer />
-              </BrowserRouter>
+              </Router>
             </MessagesProvider>
           </JobsProvider>
         </ApplicationsProvider>
