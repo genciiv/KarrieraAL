@@ -1,15 +1,12 @@
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
-// Providers / Contexts
+// Providers
 import { ToastProvider } from "./contexts/ToastContext.jsx";
 import { NotificationsProvider } from "./contexts/NotificationsContext.jsx";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 import { ApplicationsProvider } from "./contexts/ApplicationsContext.jsx";
 import { JobsProvider } from "./contexts/JobsContext.jsx";
 import { MessagesProvider } from "./contexts/MessagesContext.jsx";
-
-// Route helper
-import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 
 // Layout
 import Navbar from "./components/layout/Navbar.jsx";
@@ -32,6 +29,10 @@ import AuthRegister from "./pages/AuthRegister.jsx";
 import Onboarding from "./pages/Onboarding.jsx";
 import NewJob from "./pages/NewJob.jsx";
 import SavedJobs from "./pages/SavedJobs.jsx";
+import Following from "./pages/Following.jsx"; // ➕ faqe e re
+
+// Routes helper (nëse e përdor)
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 
 export default function App() {
   return (
@@ -53,10 +54,11 @@ export default function App() {
                     <Route path="/company/:id" element={<Company />} />
                     <Route path="/rrjeti" element={<Network />} />
                     <Route path="/ngjarje" element={<Events />} />
+                    <Route path="/ndjekjet" element={<Following />} /> {/* ➕ rruga e re */}
                     <Route path="/login" element={<AuthLogin />} />
                     <Route path="/register" element={<AuthRegister />} />
 
-                    {/* Vetëm kompani */}
+                    {/* Vetëm kompani (shembull) */}
                     <Route
                       path="/punet/shto"
                       element={

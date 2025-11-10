@@ -1,34 +1,47 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext.jsx";
+import { useApplications } from "../../contexts/ApplicationsContext.jsx";
 
-export default function JobCard({ job, saved, onSave, onApply }) {
+export default function JobCard({ job }) {
+  const { user } = useAuth();
+  const { listByUser, apply } = useApplications();
+
+  const applied = user && listByUser(user.id).some(a => a.jobId === job.id);
+
   return (
-    <div className="card job-card">
-      <div className="job-main">
-        <div className="job-title">{job.title}</div>
-        <div className="job-company">
-          {job.company} • {job.city} • {job.type}
+    <div className="card job" style={{ position: "relative" }}>
+      {applied && <div className="ribbon">Aplikuar</div>}
+
+      <div>
+        <div className="job-header">
+          <div className="job-avatar">{(job.company || "C")[0]}</div>
+          <div>
+            <div className="job-title">{job.title}</div>
+            <div className="job-company">{job.company}</div>
+          </div>
         </div>
-        <div className="job-tags">
-          {job.tags?.map((t) => (
-            <span key={t} className="chip">{t}</span>
-          ))}
+
+        <div className="job-meta">
+          <span>{job.city}</span>
+          {job.remote && <span>• Remote</span>}
+          {job.type && <span>• {job.type}</span>}
         </div>
+
+        <div className="job-salary">{job.salary}</div>
       </div>
 
-      <div className="job-side">
-        <div className="job-salary">
-          {job.salaryMin?.toLocaleString("sq-AL")}&ndash;{job.salaryMax?.toLocaleString("sq-AL")}€
-        </div>
-        <div className="job-deadline">
-          Afati: {new Date(job.deadline).toLocaleDateString("sq-AL", { day: "2-digit", month: "short" })}
-        </div>
-        <div className="job-actions">
-          <button className="button-outline" onClick={() => onSave(job.id)}>
-            {saved ? "E ruajtur" : "Ruaj"}
+      <div className="job-actions">
+        <Link to={`/punet/${job.id}`}>Detaje</Link>
+        {!applied ? (
+          <button
+            className="btn-apply"
+            onClick={() => apply({ userId: user?.id || "guest", jobId: job.id })}
+          >
+            Apliko
           </button>
-          <button className="button-primary" onClick={() => onApply(job)}>Apliko</button>
-          <Link className="button-link" to={`/punet/${job.id}`}>Detaje</Link>
-        </div>
+        ) : (
+          <button className="btn-apply" disabled>✔</button>
+        )}
       </div>
     </div>
   );

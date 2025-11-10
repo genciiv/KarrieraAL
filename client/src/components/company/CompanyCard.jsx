@@ -1,34 +1,74 @@
 import { Link } from "react-router-dom";
 
-export default function CompanyCard({ c, followed, onToggleFollow }) {
-  const initial = c.name?.[0]?.toUpperCase() || "?";
+const colorByIndustry = (industry) => {
+  switch (industry) {
+    case "Software": return "badge-soft";
+    case "IT Services": return "badge-it";
+    case "HR & Rekrutim": return "badge-hr";
+    case "Green Tech": return "badge-green";
+    case "EduTech": return "badge-edu";
+    case "Finance": return "badge-fin";
+    default: return "";
+  }
+};
+
+export default function CompanyCard({ c, following, onToggleFollow, onShowAll }) {
+  const jobs = c.openJobs || [];
+  const preview = jobs.slice(0, 2);
+  const hasMore = jobs.length > 2;
+
   return (
-    <div className="card" style={{ display: "grid", gap: 8 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div className="avatar" style={{ width: 56, height: 56, fontSize: 18 }}>{initial}</div>
-        <div>
-          <Link to={`/company/${c.id}`} style={{ fontWeight: 700 }}>{c.name}</Link>
-          <div style={{ color: "var(--text-light)", fontSize: 14 }}>
-            {c.city} • {c.industry} • {c.employees}
+    <div className="card" style={{ position: "relative" }}>
+      {following && <div className="ribbon">👀 Duke ndjekur</div>}
+
+      <div className="card-head">
+        <div className="avatar-40">{c.name?.[0] || "K"}</div>
+        <div style={{ flex: 1 }}>
+          <div className="title-md">{c.name}</div>
+          <div className="meta-row">
+            <span>{c.city}</span>
+            <span>{c.size}</span>
           </div>
         </div>
-        <div style={{ marginLeft: "auto" }}>
-          <button className="button-outline" onClick={() => onToggleFollow(c.id)}>
-            {followed ? "Ndalo ndjekjen" : "Ndiq"}
+
+        <div className="actions" style={{ alignSelf: "flex-start" }}>
+          <button
+            className={following ? "btn-primary" : "btn-ghost"}
+            onClick={() => onToggleFollow?.(c.id)}
+          >
+            {following ? "Duke ndjekur" : "Ndiq"}
           </button>
         </div>
       </div>
 
-      {c.openings?.length ? (
-        <div className="chips">
-          {c.openings.slice(0, 3).map((o) => (
-            <span key={o.id} className="chip">{o.title}</span>
-          ))}
-          {c.openings.length > 3 && <span className="chip">+{c.openings.length - 3} të tjera</span>}
-        </div>
-      ) : (
-        <div className="helper">S’ka pozicione të hapura aktualisht</div>
+      <div className="badges" style={{ marginTop: 10 }}>
+        <span className={`badge ${colorByIndustry(c.industry)}`}>{c.industry}</span>
+        <span className="badge">{c.city}</span>
+      </div>
+
+      {c.about && (
+        <p style={{ margin: "12px 0 10px", color: "#374151" }}>
+          {c.about}
+        </p>
       )}
+
+      {/* punët e hapura (deri 2) */}
+      <div className="pills">
+        {preview.length === 0 ? (
+          <span className="subtitle">S’ka pozicione të hapura aktualisht.</span>
+        ) : (
+          <>
+            {preview.map((j) => (
+              <Link key={j.id} to={j.link} className="pill">{j.title}</Link>
+            ))}
+            {hasMore && (
+              <button className="pill" onClick={() => onShowAll?.(c)} title="Shih më shumë pozicione">
+                +{jobs.length - 2} të tjera
+              </button>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

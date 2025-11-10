@@ -1,174 +1,133 @@
-import { useEffect, useMemo, useState } from "react";
-import { useToast } from "../contexts/ToastContext.jsx";
-import { useNotifications } from "../contexts/NotificationsContext.jsx";
+import { useMemo, useState } from "react";
 import JobCard from "../components/jobs/JobCard.jsx";
-import ApplyModal from "../components/jobs/ApplyModal.jsx";
-import { JOBS as SEED } from "../data/jobs.js";
 
-const LS_JOBS = "ka_jobs";
-const LS_SAVED = "ka_saved_jobs";
-const LS_APPS = "ka_applications";
+/* Mock data – funksionon pa backend */
+const JOBS_MOCK = [
+  { id: "j1", title: "Full-Stack (MERN)", company: "TechAL", city: "Tiranë",  remote: true,  salary: "1,200–1,600€", deadline: "30 Dhj", type: "Full-time" },
+  { id: "j2", title: "UI/UX Designer",     company: "Studio Durrës", city: "Durrës", remote: false, salary: "1,000–1,300€", deadline: "15 Dhj", type: "Full-time" },
+  { id: "j3", title: "Data Analyst",       company: "DataFier",      city: "Fier",   remote: false, salary: "900–1,200€",   deadline: "20 Dhj", type: "Full-time" },
+  { id: "j4", title: "DevOps Junior",      company: "AlbaniaSoft",   city: "Durrës", remote: true,  salary: "1,100–1,400€", deadline: "10 Jan", type: "Internship" },
+  { id: "j5", title: "Frontend React",     company: "BrightTech",    city: "Tiranë", remote: false, salary: "1,000–1,500€", deadline: "25 Dhj", type: "Full-time" },
+  { id: "j6", title: "Backend Node.js",    company: "CloudBase",     city: "Vlorë",  remote: true,  salary: "1,200–1,700€", deadline: "18 Dhj", type: "Full-time" },
+  { id: "j7", title: "Project Manager",    company: "Vision Group",  city: "Tiranë", remote: false, salary: "1,300–1,800€", deadline: "05 Jan", type: "Full-time" },
+  { id: "j8", title: "QA Tester",          company: "SoftTest",      city: "Durrës", remote: false, salary: "900–1,100€",   deadline: "27 Dhj", type: "Internship" },
+  { id: "j9", title: "IT Support",         company: "HelpDesk AL",   city: "Shkodër",remote: false, salary: "700–900€",     deadline: "21 Dhj", type: "Full-time" },
+  { id: "j10",title: "BI Developer",       company: "InsightAL",     city: "Tiranë", remote: true,  salary: "1,400–1,900€", deadline: "08 Jan", type: "Full-time" },
+];
+
+const unique = (arr) => Array.from(new Set(arr.filter(Boolean)));
 
 export default function Jobs() {
-  const { addToast } = useToast();
-  const { notify } = useNotifications();
+  const baseJobs = JOBS_MOCK;
 
-  // bootstrap jobs → localStorage
-  useEffect(() => {
-    if (!localStorage.getItem(LS_JOBS)) {
-      localStorage.setItem(LS_JOBS, JSON.stringify(SEED));
-    }
-  }, []);
-
-  const [jobs] = useState(() => JSON.parse(localStorage.getItem(LS_JOBS) || "null") || SEED);
-  const [saved, setSaved] = useState(() => JSON.parse(localStorage.getItem(LS_SAVED) || "[]"));
-
-  // filtra
+  // State
   const [q, setQ] = useState("");
-  const [city, setCity] = useState("");
-  const [type, setType] = useState("");           // Remote | On-site | Hybrid
-  const [minPay, setMinPay] = useState("");
-  const [deadline, setDeadline] = useState("");   // YYYY-MM-DD
-  const [sort, setSort] = useState("new");        // new | pay | deadline
+  const [city, setCity] = useState("Të gjitha");
+  const [type, setType] = useState("Të gjitha");
 
-  // pagination
-  const [page, setPage] = useState(1);
-  const pageSize = 4;
+  // Options dinamike nga të dhënat
+  const cityOptions = useMemo(
+    () => ["Të gjitha", ...unique(baseJobs.map(j => j.city))],
+    [baseJobs]
+  );
+  const typeOptions = useMemo(
+    () => ["Të gjitha", ...unique(baseJobs.map(j => j.type))],
+    [baseJobs]
+  );
 
-  const cities = useMemo(() => ["", ...new Set(jobs.map(j => j.city))], [jobs]);
-  const types = ["", "Remote", "On-site", "Hybrid"];
+  // Filtrim + kërkim
+  const jobs = useMemo(() => {
+    let list = [...baseJobs];
 
-  const filtered = useMemo(() => {
-    const s = q.toLowerCase().trim();
-    let list = jobs.filter(j => {
-      const matchQ =
-        !s ||
-        j.title.toLowerCase().includes(s) ||
-        j.company.toLowerCase().includes(s) ||
-        j.city.toLowerCase().includes(s) ||
-        j.tags?.some(t => t.toLowerCase().includes(s));
-      const matchCity = !city || j.city === city;
-      const matchType = !type || j.type === type;
-      const matchPay = !minPay || (j.salaryMin ?? 0) >= Number(minPay);
-      const matchDeadline = !deadline || new Date(j.deadline) <= new Date(deadline);
-      return matchQ && matchCity && matchType && matchPay && matchDeadline;
-    });
-
-    if (sort === "pay") list.sort((a,b) => (b.salaryMax||0) - (a.salaryMax||0));
-    else if (sort === "deadline") list.sort((a,b) => new Date(a.deadline) - new Date(b.deadline));
-    else list.sort((a,b) => (b.id > a.id ? 1 : -1));
+    const qn = q.trim().toLowerCase();
+    if (qn) {
+      list = list.filter(j =>
+        [j.title, j.company, j.city, j.type].join(" ").toLowerCase().includes(qn)
+      );
+    }
+    if (city !== "Të gjitha") list = list.filter(j => j.city === city);
+    if (type !== "Të gjitha") list = list.filter(j => j.type === type);
 
     return list;
-  }, [jobs, q, city, type, minPay, deadline, sort]);
+  }, [baseJobs, q, city, type]);
 
-  useEffect(() => { setPage(1); }, [q, city, type, minPay, deadline, sort]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const pageItems = filtered.slice((page-1)*pageSize, page*pageSize);
-
-  function toggleSave(id) {
-    setSaved(prev => {
-      const next = prev.includes(id) ? prev.filter(x => x !== id) : [id, ...prev];
-      localStorage.setItem(LS_SAVED, JSON.stringify(next));
-      addToast(prev.includes(id) ? "U hoq nga të ruajturat" : "U ruajt te Të ruajturat", "success");
-      if (!prev.includes(id)) {
-        const j = jobs.find(x => x.id === id);
-        if (j) notify({ title: "Ruajte një punë", desc: `${j.title} • ${j.company}`, kind: "info" });
-      }
-      return next;
-    });
-  }
-
-  // apply modal
-  const [open, setOpen] = useState(false);
-  const [currentJob, setCurrentJob] = useState(null);
-
-  function openApply(job) {
-    setCurrentJob(job);
-    setOpen(true);
-  }
-
-  function submitApply(form) {
-    const payload = {
-      id: Date.now().toString(),
-      jobId: currentJob.id,
-      jobTitle: currentJob.title,
-      company: currentJob.company,
-      when: new Date().toISOString(),
-      ...form,
-      status: "Në pritje"
-    };
-    const list = JSON.parse(localStorage.getItem(LS_APPS) || "[]");
-    list.unshift(payload);
-    localStorage.setItem(LS_APPS, JSON.stringify(list));
-    setOpen(false);
-    addToast("Aplikimi u dërgua ✅", "success");
-    notify({ title: "Aplikuat për një punë", desc: `${currentJob.title} • ${currentJob.company}`, kind: "success" });
-  }
+  const clearFilters = () => {
+    setQ("");
+    setCity("Të gjitha");
+    setType("Të gjitha");
+  };
 
   return (
-    <div className="container" style={{ marginTop: 24 }}>
-      <div className="card" style={{ display: "grid", gap: 12 }}>
-        <h2 style={{ margin: 0 }}>Punë</h2>
+    <div className="container" style={{ padding: "24px 0" }}>
+      <h2 style={{ margin: "0 0 12px" }}>Punë</h2>
 
-        {/* FILTRA */}
-        <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
-          <input className="input" style={{ flex: 2 }} placeholder="Kërko sipas titullit, kompanisë, qytetit, teknologjive…"
-                 value={q} onChange={(e)=>setQ(e.target.value)} />
-          <select className="select" value={city} onChange={(e)=>setCity(e.target.value)}>
-            {cities.map((c,i)=><option key={i} value={c}>{c||"Të gjitha qytetet"}</option>)}
-          </select>
-          <select className="select" value={type} onChange={(e)=>setType(e.target.value)}>
-            {types.map((t,i)=><option key={i} value={t}>{t||"Të gjitha llojet"}</option>)}
-          </select>
-          <input className="input" style={{ width: 130 }} type="number" min="0" placeholder="Pagë min €"
-                 value={minPay} onChange={(e)=>setMinPay(e.target.value)} />
-          <input className="input" style={{ width: 170 }} type="date"
-                 value={deadline} onChange={(e)=>setDeadline(e.target.value)} />
-          <select className="select" value={sort} onChange={(e)=>setSort(e.target.value)}>
-            <option value="new">Më të reja</option>
-            <option value="pay">Pagë më e lartë</option>
-            <option value="deadline">Afati më i afërt</option>
-          </select>
+      {/* FILTER BAR */}
+      <div className="card filter-bar" style={{ marginBottom: 16 }}>
+        {/* Rreshti 1: kërkimi */}
+        <div className="filter-row">
+          <input
+            className="search-input"
+            placeholder="Kërko titull, kompani, qytet…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+          <button className="reset-btn" onClick={clearFilters}>Rivendos filtrat</button>
         </div>
 
-        {/* LISTA */}
-        {!pageItems.length && <div className="helper">S’u gjet asnjë punë me këta filtra.</div>}
-
-        <div className="grid grid-2">
-          {pageItems.map(job => (
-            <JobCard
-              key={job.id}
-              job={job}
-              saved={saved.includes(job.id)}
-              onSave={toggleSave}
-              onApply={openApply}
-            />
-          ))}
-        </div>
-
-        {/* PAGINATION */}
-        {totalPages > 1 && (
-          <div className="row" style={{ justifyContent: "center", gap: 6 }}>
-            <button className="button-outline" disabled={page===1} onClick={()=>setPage(p=>p-1)}>«</button>
-            {Array.from({length: totalPages}).map((_,i)=>(
-              <button key={i}
-                className={i+1===page ? "button-primary" : "button-outline"}
-                onClick={()=>setPage(i+1)}>
-                {i+1}
+        {/* Rreshti 2: Qyteti */}
+        <div className="filter-row">
+          <span className="filter-label">Qyteti:</span>
+          <div className="chips">
+            {cityOptions.map((opt) => (
+              <button
+                key={opt}
+                className={`chip-btn ${city === opt ? "active" : ""}`}
+                onClick={() => setCity(opt)}
+              >
+                {opt}
               </button>
             ))}
-            <button className="button-outline" disabled={page===totalPages} onClick={()=>setPage(p=>p+1)}>»</button>
           </div>
-        )}
+        </div>
+
+        {/* Rreshti 3: Tipi */}
+        <div className="filter-row">
+          <span className="filter-label">Tipi:</span>
+          <div className="chips">
+            {typeOptions.map((opt) => (
+              <button
+                key={opt}
+                className={`chip-btn ${type === opt ? "active" : ""}`}
+                onClick={() => setType(opt)}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* info */}
+        <div className="filter-row" style={{ color: "#6b7280", fontSize: 14 }}>
+          {jobs.length} rezultate
+          {q && <> • kërkim për <strong>{q}</strong></>}
+          {(city !== "Të gjitha" || type !== "Të gjitha") && (
+            <>
+              {" "}• filtruar ( {city}{type !== "Të gjitha" ? `, ${type}` : ""} )
+            </>
+          )}
+        </div>
       </div>
 
-      <ApplyModal
-        open={open}
-        onClose={()=>setOpen(false)}
-        job={currentJob}
-        onSubmit={submitApply}
-      />
+      {/* GRID: 4 kolona */}
+      {jobs.length === 0 ? (
+        <div className="card" style={{ textAlign: "center", color: "#6b7280" }}>
+          Nuk u gjet asnjë rezultat. Provo ndrysho filtrat.
+        </div>
+      ) : (
+        <div className="cards-grid cards-4">
+          {jobs.map(job => <JobCard key={job.id} job={job} />)}
+        </div>
+      )}
     </div>
   );
 }

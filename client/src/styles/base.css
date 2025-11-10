@@ -1,335 +1,389 @@
 /* ===========================
-   Reset i lehtë + tipografi
+   RESET & TYPOGRAPHY
    =========================== */
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
 body {
   margin: 0;
   font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
-  background: var(--bg-light);
-  color: var(--text-dark);
+  background: #f9fafb; /* bg e lehtë */
+  color: #111827;      /* text i errët i lexueshëm */
   line-height: 1.6;
 }
-
 img { max-width: 100%; display: block; }
-a { color: var(--primary); text-decoration: none; font-weight: 500; }
+a { color: #0a66c2; text-decoration: none; font-weight: 500; }
 a:hover { text-decoration: underline; }
 
 /* ===========================
-   Layout i përgjithshëm
+   CONTAINER & GRID
    =========================== */
-.container {
-  max-width: 1100px;
-  padding: 0 16px;
-  margin: 0 auto;
-}
-
-/* ===========================
-   Navbar (me drawer mobile)
-   =========================== */
-.navbar {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 1000;
-}
-.navbar-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; padding: 14px 0;
-}
-.brand {
-  font-weight: 800; font-size: 1.3rem; letter-spacing: 0.2px;
-  color: var(--text-dark);
-}
-.brand span { color: var(--primary); }
-.nav-links { display: flex; gap: 20px; align-items: center; }
-.nav-cta { display: flex; gap: 10px; align-items: center; }
-
-/* Toggle vetëm në mobile */
-.menu-toggle {
-  display: none;
-  border: 1px solid var(--border);
-  background: var(--white);
-  padding: 8px 12px;
-  border-radius: 8px;
-}
-@media (max-width: 800px) {
-  .nav-links { display: none; }
-  .menu-toggle { display: inline-block; }
-  .nav-drawer {
-    display: none; position: absolute; left: 0; right: 0; top: 60px;
-    background: var(--white); border-bottom: 1px solid var(--border);
-  }
-  .nav-drawer.open { display: block; }
-  .nav-drawer a { display: block; padding: 12px 16px; border-top: 1px solid var(--border); }
-}
-
-/* ===========================
-   Seksioni Hero
-   =========================== */
-.hero {
-  background: var(--secondary);
-  padding: 80px 0;
-  text-align: center;
-}
-.hero h1 { font-size: 2.2rem; margin: 0 0 10px; color: var(--text-dark); }
-.hero p  { font-size: 1.1rem; color: var(--text-light); margin: 0; }
-.hero-actions {
-  margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-}
-
-/* ===========================
-   Komponentë UI
-   =========================== */
-.button-primary {
-  background: var(--primary);
-  color: var(--white);
-  border: none;
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-}
-.button-primary:hover { background: #e64040; }
-
-.button-outline {
-  background: var(--white);
-  color: var(--primary);
-  border: 1px solid var(--primary);
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-weight: 600;
-  transition: 0.2s;
-}
-.button-outline:hover { background: #ffe9e9; }
-
-/* Karta / panel */
-.card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-/* Grida e thjeshtë */
+.container { max-width: 1200px; padding: 0 16px; margin: 0 auto; }
 .grid { display: grid; gap: 16px; }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 900px){ .grid-3 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px){ .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
-@media (max-width: 900px) {
-  .grid-3 { grid-template-columns: 1fr 1fr; }
+/* ===========================
+   NAVBAR – STIL LINKEDIN
+   =========================== */
+.nav {
+  position: sticky; top: 0; z-index: 1000;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 24px; gap: 24px;
+}
+/* Logo */
+.logo {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 1.4rem; font-weight: 800; color: #0a66c2;
+}
+.logo span { color: #222; }
+/* Search */
+.nav-search { flex: 1; max-width: 420px; position: relative; }
+.nav-search input {
+  width: 100%; padding: 8px 12px 8px 38px;
+  border: 1px solid #d1d5db; border-radius: 8px;
+  background: #f3f4f6; font-size: .95rem; outline: none; transition: .2s;
+}
+.nav-search input:focus {
+  background: #fff; border-color: #0a66c2; box-shadow: 0 0 0 2px rgba(10,102,194,.15);
+}
+.nav-search::before {
+  content: "🔍"; position: absolute; left: 12px; top: 7px;
+  font-size: 1.05rem; color: #6b7280;
+}
+/* Links */
+.nav-links { display: flex; align-items: center; gap: 22px; }
+.nav-link {
+  font-size: .94rem; font-weight: 500; color: #444; text-decoration: none;
+  transition: color .2s ease; position: relative; padding: 4px 0;
+}
+.nav-link:hover { color: #0a66c2; }
+.nav-link.active { color: #0a66c2; font-weight: 600; }
+/* Right */
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.button-outline {
+  border: 1px solid #0a66c2; background: transparent; color: #0a66c2;
+  padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: .9rem; transition: .2s;
+}
+.button-outline:hover { background: #e8f3ff; }
+.button-primary {
+  background: #0a66c2; color: #fff; border: none; padding: 8px 14px;
+  border-radius: 8px; font-weight: 600; transition: .2s;
+}
+.button-primary:hover { background: #004182; }
+/* Toggle + Drawer (mobile) */
+.nav-toggle { display: none; background: none; border: none; font-size: 1.8rem; color: #333; cursor: pointer; }
+.nav-drawer {
+  display: none; flex-direction: column; background: #fff;
+  border-top: 1px solid #e5e7eb; box-shadow: 0 3px 10px rgba(0,0,0,.08);
+  position: absolute; top: 62px; left: 0; right: 0; animation: fadeSlide .3s ease;
+}
+.nav-drawer.open { display: flex; }
+.nav-drawer a { padding: 14px 20px; color: #444; text-decoration: none; border-top: 1px solid #f0f0f0; }
+.nav-drawer a:hover { background: #f9fafb; color: #0a66c2; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(-10px);} to { opacity: 1; transform: translateY(0);} }
+@media (max-width: 900px){
+  .nav-links, .nav-search, .nav-right { display: none; }
+  .nav-toggle { display: block; }
+}
+
+/* ===========================
+   HERO (opsionale)
+   =========================== */
+.hero { background: #eef5ff66; padding: 48px 0 28px; text-align: center; }
+.hero h1 { margin: 0 0 8px; font-size: clamp(26px,3.2vw,40px); line-height: 1.2; }
+.hero p { color: #6b7280; margin: 0; }
+
+/* ===========================
+   BUTTONS SHARED
+   =========================== */
+.btn-ghost {
+  background: transparent; border: 1px solid #e7e9ee; color:#374151;
+  padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: .2s;
+}
+.btn-ghost:hover { border-color:#0a66c2; color:#0a66c2; }
+.btn-primary {
+  background:#0a66c2; color:#fff; border:none; padding:8px 12px;
+  border-radius:8px; font-weight:600; cursor:pointer; transition: .2s;
+}
+.btn-primary:hover { background:#004182; }
+
+/* ===========================
+   CARDS – stil LinkedIn
+   =========================== */
+.card {
+  background: #fff;
+  border: 1px solid #e7e9ee;
+  border-radius: 12px;
+  padding: 16px;
+  transition: box-shadow .2s ease, transform .15s ease, border-color .2s ease;
+}
+.card:hover {
+  border-color: #dfe3ea;
+  box-shadow: 0 6px 20px rgba(12, 27, 77, 0.06);
+  transform: translateY(-1px);
+}
+/* header standard për karta */
+.card-head { display: flex; align-items: flex-start; gap: 12px; justify-content: space-between; }
+.card-head .avatar-40 {
+  width: 40px; height: 40px; border-radius: 8px; background: #eef2f7;
+  display: grid; place-items: center; font-weight: 800; color: #445; flex: 0 0 40px;
+}
+/* meta rresht i imët */
+.meta-row { display: flex; flex-wrap: wrap; gap: 10px; color: #6b7280; font-size: 13px; }
+/* badges */
+.badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: 999px;
+  background: #f3f4f6; color: #374151; font-size: 12.5px; border: 1px solid #eaecf0;
+}
+/* pills (lista e shpejtë) */
+.pills { display:flex; flex-wrap:wrap; gap:8px; }
+.pill {
+  display:inline-flex; align-items:center; gap:6px;
+  padding: 6px 10px; border-radius: 999px;
+  border: 1px solid #e7e9ee; background:#fff; font-size:13px;
+}
+.pill:hover { border-color:#0a66c2; color:#0a66c2; }
+/* side (kolona djathtas) */
+.side { min-width: 210px; text-align: right; }
+/* actions */
+.actions { display: flex; gap: 8px; justify-content: flex-end; }
+/* ribbon */
+.ribbon {
+  position: absolute; top: 10px; right: 10px;
+  background:#e8f3ff; color:#0a66c2; border:1px solid #cfe4ff;
+  padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight:700;
+}
+/* tituj/tekste */
+.kicker { font-size:12px; letter-spacing:.4px; text-transform:uppercase; color:#6b7280; }
+.title-md { font-weight:800; font-size:17px; color:#0f172a; }
+.subtitle { color:#4b5563; }
+/* ngjyra lehta industrie */
+.badge-soft { background:#f6f8ff; color:#223; border-color:#e6eafe; }
+.badge-it   { background:#f0fff4; color:#205; border-color:#dff7e6; }
+.badge-hr   { background:#fff7ed; color:#542; border-color:#ffe8d3; }
+.badge-green{ background:#eefcf4; color:#254; border-color:#dcf7e7; }
+.badge-edu  { background:#f5f0ff; color:#324; border-color:#e8e0ff; }
+.badge-fin  { background:#fff0f3; color:#523; border-color:#ffd9e0; }
+
+/* ===========================
+   MODAL (nëse përdor)
+   =========================== */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.25); display: grid; place-items: center; z-index: 70; }
+.modal {
+  width: min(560px, 92vw); background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 14px; padding: 16px; box-shadow: 0 10px 28px rgba(0,0,0,.15);
+}
+
+/* ===========================
+   JOB GRID – 4 columns
+   =========================== */
+.cards-grid {
+  display: grid;
+  gap: 16px;
+}
+.cards-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.cards-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.cards-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .cards-4 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 850px) {
+  .cards-4, .cards-3 { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 600px) {
-  .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .cards-4, .cards-3, .cards-2 { grid-template-columns: 1fr; }
 }
 
 /* ===========================
-   Footer
+   JOB CARD COMPACT STYLE
    =========================== */
-.footer {
-  margin-top: 40px; padding: 24px 0;
-  border-top: 1px solid var(--border);
-  background: var(--white);
-  color: var(--text-light);
-  font-size: 0.95rem;
-}
-.footer a { color: inherit; }
-
-/* ===========================
-   Skeleton Loading
-   =========================== */
-.skeleton {
-  position: relative;
-  background: #eee;
+.card.job {
+  padding: 14px;
   border-radius: 10px;
-  overflow: hidden;
-}
-.skeleton.shine::after {
-  content: "";
-  position: absolute; inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-  animation: shine 1.2s infinite;
-}
-@keyframes shine { 100% { transform: translateX(100%); } }
-
-/* ===========================
-   Toast Njoftime
-   =========================== */
-.toast-container {
-  position: fixed; right: 16px; bottom: 16px; z-index: 9999;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.toast {
-  background: var(--white);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  padding: 12px 14px; border-radius: 10px; min-width: 240px;
-}
-.toast.success { border-color: #38a169; }
-.toast.error   { border-color: #e53e3e; }
-
-/* ===========================
-   Forma / Inputs
-   =========================== */
-.form { display: grid; gap: 12px; }
-.input, .select, .textarea {
-  border: 1px solid var(--border); border-radius: 10px;
-  padding: 10px 12px; background: var(--white);
-}
-.label { font-weight: 600; font-size: 0.95rem; }
-.row { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
-@media (max-width: 700px){ .row { grid-template-columns: 1fr; } }
-.helper { color: var(--text-light); font-size: 0.9rem; }
-.error  { color: #e53e3e; font-size: 0.9rem; }
-
-/* ===========================
-   Chips / Avatar / Lista
-   =========================== */
-.chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.chip {
-  background: var(--secondary); color: var(--text-dark);
-  border-radius: 999px; padding: 6px 10px; font-size: 0.9rem;
-}
-
-.avatar {
-  width: 72px; height: 72px; border-radius: 50%; background: #ddd;
-  display: grid; place-items: center; font-weight: 700; color: #666;
-}
-
-.section { display: grid; gap: 12px; }
-.section h3 { margin: 0; }
-.item {
-  border: 1px dashed var(--border);
-  border-radius: 12px; padding: 14px; background: var(--white);
-}
-
-/* ===========================
-   Utils të shpeshtë
-   =========================== */
-.hide { display: none !important; }
-.center { display: grid; place-items: center; }
-.mt-24 { margin-top: 24px; }
-.mb-16 { margin-bottom: 16px; }
-.btn-right { display: inline-flex; justify-content: flex-end; width: 100%; }
-.avatar-img { width: 72px; height: 72px; overflow: hidden; }
-.feed .card {
-  transition: all 0.2s ease;
-}
-.feed .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.avatar-img { width: 72px; height: 72px; overflow: hidden; }
-
-
-/* ---------- HOME / HERO ---------- */
-.hero {
-  background: #eaf1ff55; /* blu shumë e lehtë */
-  padding: 48px 0 28px;
-}
-.hero-title {
-  font-size: clamp(26px, 3.2vw, 40px);
-  line-height: 1.2;
-  text-align: center;
-  margin: 0 0 8px 0;
-}
-.hero-sub {
-  text-align: center;
-  color: var(--text-light);
-  margin-bottom: 16px;
-}
-.cta-row {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 18px;
-}
-
-/* ---------- STATS ---------- */
-.stats {
-  margin-top: 8px;
-}
-.stat {
-  text-align: center;
   background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.stat-num {
-  font-weight: 800;
-  font-size: 28px;
-}
-.stat-label {
-  color: var(--text-light);
-  margin-top: 4px;
+.card.job:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+  border-color: #d1d5db;
 }
 
-/* ---------- TESTIMONIALS ---------- */
-.testimonial {
-  text-align: center;
-  display: grid;
-  gap: 6px;
+/* Header */
+.job-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
 }
-.testimonial-avatar {
-  margin: 0 auto 6px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--accent-verylight, #ffe8e8);
+.job-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #f3f4f6;
   display: grid;
   place-items: center;
   font-weight: 700;
-  color: var(--accent, #ff5a5f);
+  color: #374151;
 }
-.testimonial-name { font-weight: 700; }
-.testimonial-role { color: var(--text-light); font-size: 14px; }
-.testimonial-text { margin-top: 6px; }
+.job-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+.job-company {
+  font-size: 13px;
+  color: #6b7280;
+}
 
-/* ---------- PARTNERS ---------- */
-.partners-wrap { background: #fafbfd; padding: 16px 0; margin-top: 12px; }
-.partners {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
+/* Meta */
+.job-meta {
+  font-size: 13px;
+  color: #6b7280;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
 }
-.partner-pill {
-  border: 1px dashed var(--border);
-  background: #fff;
+.job-salary {
+  color: #0a66c2;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+/* Actions */
+.job-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+.job-actions a {
+  color: #0a66c2;
+  font-weight: 500;
+}
+.job-actions a:hover {
+  text-decoration: underline;
+}
+.btn-apply {
+  background: #0a66c2;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-apply:hover {
+  background: #004182;
+}
+
+/* Badge kur është aplikuar */
+.ribbon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #e8f3ff;
+  color: #0a66c2;
+  border: 1px solid #cfe4ff;
+  padding: 3px 8px;
   border-radius: 999px;
-  padding: 10px 14px;
-  text-align: center;
+  font-size: 11px;
   font-weight: 600;
-  color: #444;
 }
 
-/* ---------- FAQ ACCORDION ---------- */
-.accordion { display: grid; gap: 10px; }
-.acc-item { border: 1px solid var(--border); border-radius: 12px; background: #fff; }
-.acc-q {
-  width: 100%;
-  text-align: left;
-  padding: 12px 14px;
-  font-weight: 600;
-  display: flex; align-items: center; justify-content: space-between;
+
+/* ===========================
+   FILTER BAR (chips)
+   =========================== */
+.filter-bar {
+  display: grid;
+  gap: 12px;
 }
-.acc-q:hover { background: #fafafa; }
-.acc-a { padding: 0 14px 14px; color: #444; }
-.acc-icon { color: var(--accent, #ff5a5f); font-size: 18px; }
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.filter-label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 600;
+  margin-right: 6px;
+}
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #eaecf0;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .15s ease;
+}
+.chip-btn:hover {
+  background: #eef2f7;
+  border-color: #dfe3ea;
+}
+.chip-btn.active {
+  background: #e8f3ff;
+  color: #0a66c2;
+  border-color: #b8d8ff;
+}
+.reset-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px dashed #d1d5db;
+  color: #374151;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.reset-btn:hover { border-color: #0a66c2; color:#0a66c2; }
 
-
-.job-card { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; }
-.job-title { font-weight: 800; font-size: 18px; }
-.job-company { color: var(--text-light); margin: 4px 0 8px; }
-.job-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.job-side { text-align: right; min-width: 220px; }
-.job-salary { color: var(--accent, #ff5a5f); font-weight: 800; }
-.job-deadline { color: var(--text-light); font-size: 13px; margin: 4px 0 6px; }
-.job-actions { display: flex; justify-content: flex-end; gap: 6px; }
-
-.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.25); display: grid; place-items: center; z-index: 50; }
-.modal { width: min(560px, 92vw); background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
-
+/* Kërkimi */
+.search-input {
+  flex: 1;
+  min-width: 240px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
