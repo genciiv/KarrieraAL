@@ -1,45 +1,34 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext.jsx";
-import { useApplications } from "../../contexts/ApplicationsContext.jsx";
 
-export default function JobCard({ job }) {
-  const { user } = useAuth();
-  const { listByUser } = useApplications();
-  const applied = user && listByUser(user.id).some(a => a.jobId === job.id);
-
+export default function JobCard({ job, saved, onSave, onApply }) {
   return (
-    <div className="card" style={{ display: "grid", gap: 6, position: "relative" }}>
-      {applied && (
-        <div style={{
-          position: "absolute",
-          top: 8,
-          right: 8,
-          background: "var(--secondary)",
-          color: "var(--text-dark)",
-          fontSize: "0.8rem",
-          fontWeight: 600,
-          padding: "4px 10px",
-          borderRadius: "999px"
-        }}>
-          ✅ Aplikuar
+    <div className="card job-card">
+      <div className="job-main">
+        <div className="job-title">{job.title}</div>
+        <div className="job-company">
+          {job.company} • {job.city} • {job.type}
         </div>
-      )}
-
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-        <div>
-          <h3 style={{ margin: "0 0 4px" }}>{job.title}</h3>
-          <div style={{ color: "var(--text-light)" }}>
-            {job.company} • {job.city} {job.remote ? "• Remote" : ""}
-          </div>
+        <div className="job-tags">
+          {job.tags?.map((t) => (
+            <span key={t} className="chip">{t}</span>
+          ))}
         </div>
-        <strong style={{ color: "var(--primary)" }}>{job.salary}</strong>
       </div>
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 8, color: "var(--text-light)", fontSize: 14 }}>
-        <span>Afati: {job.deadline}</span>
-        <span style={{ marginLeft: "auto" }}>
-          <Link to={`/punet/${job.id}`}>Detaje</Link>
-        </span>
+      <div className="job-side">
+        <div className="job-salary">
+          {job.salaryMin?.toLocaleString("sq-AL")}&ndash;{job.salaryMax?.toLocaleString("sq-AL")}€
+        </div>
+        <div className="job-deadline">
+          Afati: {new Date(job.deadline).toLocaleDateString("sq-AL", { day: "2-digit", month: "short" })}
+        </div>
+        <div className="job-actions">
+          <button className="button-outline" onClick={() => onSave(job.id)}>
+            {saved ? "E ruajtur" : "Ruaj"}
+          </button>
+          <button className="button-primary" onClick={() => onApply(job)}>Apliko</button>
+          <Link className="button-link" to={`/punet/${job.id}`}>Detaje</Link>
+        </div>
       </div>
     </div>
   );
