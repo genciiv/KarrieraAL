@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "../contexts/ToastContext.jsx";
+import { useNotifications } from "../contexts/NotificationsContext.jsx";
 import JobCard from "../components/jobs/JobCard.jsx";
 import ApplyModal from "../components/jobs/ApplyModal.jsx";
 import { JOBS as SEED } from "../data/jobs.js";
@@ -10,6 +11,7 @@ const LS_APPS = "ka_applications";
 
 export default function Jobs() {
   const { addToast } = useToast();
+  const { notify } = useNotifications();
 
   // bootstrap jobs → localStorage
   useEffect(() => {
@@ -18,7 +20,7 @@ export default function Jobs() {
     }
   }, []);
 
-  const [jobs, setJobs] = useState(() => JSON.parse(localStorage.getItem(LS_JOBS) || "null") || SEED);
+  const [jobs] = useState(() => JSON.parse(localStorage.getItem(LS_JOBS) || "null") || SEED);
   const [saved, setSaved] = useState(() => JSON.parse(localStorage.getItem(LS_SAVED) || "[]"));
 
   // filtra
@@ -69,6 +71,10 @@ export default function Jobs() {
       const next = prev.includes(id) ? prev.filter(x => x !== id) : [id, ...prev];
       localStorage.setItem(LS_SAVED, JSON.stringify(next));
       addToast(prev.includes(id) ? "U hoq nga të ruajturat" : "U ruajt te Të ruajturat", "success");
+      if (!prev.includes(id)) {
+        const j = jobs.find(x => x.id === id);
+        if (j) notify({ title: "Ruajte një punë", desc: `${j.title} • ${j.company}`, kind: "info" });
+      }
       return next;
     });
   }
@@ -97,6 +103,7 @@ export default function Jobs() {
     localStorage.setItem(LS_APPS, JSON.stringify(list));
     setOpen(false);
     addToast("Aplikimi u dërgua ✅", "success");
+    notify({ title: "Aplikuat për një punë", desc: `${currentJob.title} • ${currentJob.company}`, kind: "success" });
   }
 
   return (
